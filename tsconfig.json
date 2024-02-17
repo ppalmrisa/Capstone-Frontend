@@ -22,7 +22,22 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/*": ["./*"],
+      "@/components": ["./components"],
+      "@/providers": ["./providers"],
+      "@/pages": ["./pages"],
+      "@/api": ["./api"],
+      "@/app": ["./app"],
+      "@/types": ["./types"],
+      "@/config": ["./config"],
+      "@/utils": ["./utils"],
+      "@/features": ["./features"],
+      "@/assets": ["./assets"],
+      "@/hooks": ["./hooks"],
+      "@/styles": ["./styles"],
+    },
   },
   "include": [
     "next-env.d.ts",
