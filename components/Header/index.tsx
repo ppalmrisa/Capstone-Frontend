@@ -20,6 +20,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { MantineLogo } from '@mantinex/mantine-logo';
 import {
   IconBook,
   IconChartPie3,
@@ -29,10 +30,9 @@ import {
   IconFingerprint,
   IconNotification,
 } from '@tabler/icons-react';
-
-import { MantineLogo } from '@mantinex/mantine-logo';
 import { useRouter } from 'next/navigation';
 import { useCookies } from 'react-cookie';
+
 import classes from './styles.module.css';
 
 const mockdata = [

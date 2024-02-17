@@ -1,4 +1,5 @@
 import { Box, Center, Container } from '@mantine/core';
+
 import { HeaderMegaMenu } from '../Header';
 
 export default function Layout({ children }: { children: React.ReactNode }) {

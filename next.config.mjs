@@ -1,4 +1,7 @@
-/** @type {import('next').NextConfig} */
+/**
+ * @type {import('next').NextConfig}
+ */
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -12,8 +15,8 @@ const nextConfig = {
     ];
   },
   env: {
-    CAPSTONE_SESSION_TOKEN: process.env.CAPSTONE_SESSION_TOKEN,
-    BASE_URL: process.env.BASE_URL,
+    CAPSTONE_SESSION_TOKEN: process.env.CAPSTONE_SESSION_TOKEN || 'capstone-session-token',
+    BASE_URL: process.env.BASE_URL || 'http://localhost:3000',
   },
 };
 
