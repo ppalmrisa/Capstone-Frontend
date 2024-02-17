@@ -18,7 +18,7 @@ const nextConfig = {
     CAPSTONE_SESSION_TOKEN: process.env.CAPSTONE_SESSION_TOKEN || 'capstone-session-token',
     BASE_URL: process.env.BASE_URL || 'http://localhost:3000',
   },
-  output: 'export',
+  // output: 'export',
   // Add basePath
   // basePath: '/github-pages',
   images: {
