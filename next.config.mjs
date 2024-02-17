@@ -19,6 +19,11 @@ const nextConfig = {
     BASE_URL: process.env.BASE_URL || 'http://localhost:3000',
   },
   output: 'export',
+  // Add basePath
+  // basePath: '/github-pages',
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
