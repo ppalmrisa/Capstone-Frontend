@@ -1,6 +1,8 @@
 'use client';
 
-import { Anchor, Box, Group, Progress, Table, Text } from '@mantine/core';
+import { Anchor, Box, Button, Flex, Group, Progress, Table, Text } from '@mantine/core';
+import { IconSquareArrowRight } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
 
 import classes from './styles.module.css';
 
@@ -44,13 +46,19 @@ const data = [
 ];
 
 export default function HomeFeature() {
-  const rows = data.map((row) => {
+  const router = useRouter();
+
+  const handleClickCreate = () => router.push('/create');
+
+  const handleClickDetail = (id: string) => router.push(`/detail/${id}`);
+
+  const rows = data.map((row, index) => {
     const totalReviews = row.reviews.negative + row.reviews.positive;
     const positiveReviews = (row.reviews.positive / totalReviews) * 100;
     const negativeReviews = (row.reviews.negative / totalReviews) * 100;
-
     return (
       <Table.Tr key={row.title}>
+        <Table.Td>{index}</Table.Td>
         <Table.Td>
           <Anchor component="button" fz="sm">
             {row.title}
@@ -86,24 +94,34 @@ export default function HomeFeature() {
             />
           </Progress.Root>
         </Table.Td>
+        <Table.Td>
+          <Button variant="white" onClick={() => handleClickDetail(`${index}`)}>
+            <IconSquareArrowRight />
+          </Button>
+        </Table.Td>
       </Table.Tr>
     );
   });
+
   return (
     <Box>
-      <Text size={'32px'} fw="bold" mb="md">
-        Job List<Text size="md" span>{` (Total: ${rows.length})`}</Text>
-      </Text>
-
+      <Flex justify="space-between" align="center" mb="md">
+        <Text size="32px" fw="bold" mb="md">
+          Job List<Text size="md" span>{` (Total: ${rows.length})`}</Text>
+        </Text>
+        <Button onClick={handleClickCreate}>Create Job</Button>
+      </Flex>
       <Table.ScrollContainer minWidth={800}>
         <Table verticalSpacing="xs">
           <Table.Thead>
             <Table.Tr>
+              <Table.Th>ID</Table.Th>
               <Table.Th>Book title</Table.Th>
               <Table.Th>Year</Table.Th>
               <Table.Th>Author</Table.Th>
               <Table.Th>Reviews</Table.Th>
               <Table.Th>Reviews distribution</Table.Th>
+              <Table.Th />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>

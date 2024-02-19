@@ -1,7 +1,14 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import dayjs from 'dayjs';
 
 import '@mantine/core/styles.css';
+import 'dayjs/locale/th';
+import 'dayjs/plugin/utc';
+
 import { theme } from '../theme';
+
+dayjs.locale('th');
 
 export const metadata = {
   title: 'Capstone Project',
@@ -14,13 +21,17 @@ export default function RootLayout({ children }: { children: any }) {
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
+        <meta charSet="UTF-8" />
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
         />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          {children}
+          <Notifications />
+        </MantineProvider>
       </body>
     </html>
   );
