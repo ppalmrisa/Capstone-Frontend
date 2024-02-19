@@ -3,6 +3,8 @@ import { Notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
 
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+
 import 'dayjs/locale/th';
 import 'dayjs/plugin/utc';
 
