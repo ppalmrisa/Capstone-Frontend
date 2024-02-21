@@ -3,6 +3,9 @@
 import { Anchor, Box, Button, Flex, Group, Progress, Table, Text } from '@mantine/core';
 import { IconSquareArrowRight } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import { apiGetJobList } from '@/api/home';
 
 import classes from './styles.module.css';
 
@@ -47,6 +50,17 @@ const data = [
 
 export default function HomeFeature() {
   const router = useRouter();
+  const [jobs, setJobs] = useState([]);
+
+  useEffect(() => {
+    onGetJobList();
+  }, []);
+
+  const onGetJobList = async () => {
+    const res = await apiGetJobList();
+    console.log('onGetJobList :: ', res);
+    // setJobs(res.data)
+  };
 
   const handleClickCreate = () => router.push('/create');
 
