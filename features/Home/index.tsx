@@ -1,115 +1,100 @@
 'use client';
 
-import { Anchor, Box, Button, Flex, Group, Progress, Table, Text } from '@mantine/core';
+import {
+  Anchor,
+  Badge,
+  Box,
+  Button,
+  Flex,
+  LoadingOverlay,
+  ScrollArea,
+  Table,
+  Text,
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { IconSquareArrowRight } from '@tabler/icons-react';
+import cx from 'clsx';
+import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { apiGetJobList } from '@/api/home';
+import { IGetJobList } from '@/types';
 
 import classes from './styles.module.css';
 
-const data = [
-  {
-    title: 'Foundation',
-    author: 'Isaac Asimov',
-    year: 1951,
-    reviews: { positive: 2223, negative: 259 },
-  },
-  {
-    title: 'Frankenstein',
-    author: 'Mary Shelley',
-    year: 1818,
-    reviews: { positive: 5677, negative: 1265 },
-  },
-  {
-    title: 'Solaris',
-    author: 'Stanislaw Lem',
-    year: 1961,
-    reviews: { positive: 3487, negative: 1845 },
-  },
-  {
-    title: 'Dune',
-    author: 'Frank Herbert',
-    year: 1965,
-    reviews: { positive: 8576, negative: 663 },
-  },
-  {
-    title: 'The Left Hand of Darkness',
-    author: 'Ursula K. Le Guin',
-    year: 1969,
-    reviews: { positive: 6631, negative: 993 },
-  },
-  {
-    title: 'A Scanner Darkly',
-    author: 'Philip K Dick',
-    year: 1977,
-    reviews: { positive: 8124, negative: 1847 },
-  },
-];
-
 export default function HomeFeature() {
   const router = useRouter();
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<IGetJobList[]>([]);
+  const [scrolled, setScrolled] = useState(false);
+  const [visible, { open, close }] = useDisclosure(false);
 
   useEffect(() => {
+    open();
     onGetJobList();
   }, []);
 
   const onGetJobList = async () => {
-    const res = await apiGetJobList();
-    console.log('onGetJobList :: ', res);
-    // setJobs(res.data)
+    try {
+      const res = await apiGetJobList();
+      setJobs(res?.data);
+      close();
+    } catch (error: any) {
+      close();
+      const message = error?.response?.data?.message;
+      notifications.show({
+        title: error?.message,
+        message: `${error?.code} : ${message}`,
+        color: 'red',
+      });
+    }
   };
 
   const handleClickCreate = () => router.push('/create');
 
   const handleClickDetail = (id: string) => router.push(`/detail/${id}`);
 
-  const rows = data.map((row, index) => {
-    const totalReviews = row.reviews.negative + row.reviews.positive;
-    const positiveReviews = (row.reviews.positive / totalReviews) * 100;
-    const negativeReviews = (row.reviews.negative / totalReviews) * 100;
+  const rows = jobs.map((row, index) => {
+    let statusColor = 'gray';
+    switch (row.status) {
+      case 'working':
+        statusColor = 'green';
+        break;
+      case 'failed':
+        statusColor = 'red';
+        break;
+      case 'running':
+        statusColor = 'yellow';
+        break;
+      default:
+        break;
+    }
     return (
-      <Table.Tr key={row.title}>
-        <Table.Td>{index}</Table.Td>
+      <Table.Tr key={row.id}>
+        <Table.Td>{index + 1}</Table.Td>
         <Table.Td>
           <Anchor component="button" fz="sm">
-            {row.title}
+            {row.jobName}
           </Anchor>
         </Table.Td>
-        <Table.Td>{row.year}</Table.Td>
         <Table.Td>
-          <Anchor component="button" fz="sm">
-            {row.author}
-          </Anchor>
-        </Table.Td>
-        <Table.Td>{Intl.NumberFormat().format(totalReviews)}</Table.Td>
-        <Table.Td>
-          <Group justify="space-between">
-            <Text fz="xs" c="teal" fw={700}>
-              {positiveReviews.toFixed(0)}%
-            </Text>
-            <Text fz="xs" c="red" fw={700}>
-              {negativeReviews.toFixed(0)}%
-            </Text>
-          </Group>
-          <Progress.Root>
-            <Progress.Section
-              className={classes.progressSection}
-              value={positiveReviews}
-              color="teal"
-            />
-
-            <Progress.Section
-              className={classes.progressSection}
-              value={negativeReviews}
-              color="red"
-            />
-          </Progress.Root>
+          <Badge color={statusColor} radius="xs">
+            {row.status}
+          </Badge>
         </Table.Td>
         <Table.Td>
-          <Button variant="white" onClick={() => handleClickDetail(`${index}`)}>
+          <Text w={130} size="sm">
+            {dayjs(row.jobPeriodStart).format('D MMM YYYY HH:mm')}
+          </Text>
+        </Table.Td>
+        <Table.Td>
+          <Text w={130} size="sm">
+            {dayjs(row.jobPeriodEnd).format('D MMM YYYY HH:mm')}
+          </Text>
+        </Table.Td>
+        <Table.Td>
+          <Button variant="white" onClick={() => handleClickDetail(row.id)}>
             <IconSquareArrowRight />
           </Button>
         </Table.Td>
@@ -125,22 +110,22 @@ export default function HomeFeature() {
         </Text>
         <Button onClick={handleClickCreate}>Create Job</Button>
       </Flex>
-      <Table.ScrollContainer minWidth={800}>
+      <ScrollArea h={500} onScrollPositionChange={({ y }) => setScrolled(y !== 0)} type="always">
+        <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
         <Table verticalSpacing="xs">
-          <Table.Thead>
+          <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
             <Table.Tr>
-              <Table.Th>ID</Table.Th>
-              <Table.Th>Book title</Table.Th>
-              <Table.Th>Year</Table.Th>
-              <Table.Th>Author</Table.Th>
-              <Table.Th>Reviews</Table.Th>
-              <Table.Th>Reviews distribution</Table.Th>
+              <Table.Th>No.</Table.Th>
+              <Table.Th>Job</Table.Th>
+              <Table.Th>Status</Table.Th>
+              <Table.Th>Start date</Table.Th>
+              <Table.Th>End date</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
-      </Table.ScrollContainer>
+      </ScrollArea>
     </Box>
   );
 }

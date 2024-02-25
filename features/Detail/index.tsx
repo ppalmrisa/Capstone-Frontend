@@ -7,14 +7,21 @@ import {
   Card,
   Grid,
   Image,
+  LoadingOverlay,
   Paper,
   SimpleGrid,
   Stack,
   Text,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
+import dayjs from 'dayjs';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { apiGetJobDetail } from '@/api/home';
+import { IGetJobList } from '@/types';
 
 import classes from './styles.module.css';
 
@@ -50,6 +57,29 @@ export default function DetailFeature() {
   const { id } = useParams();
   const [startTime] = useState('19-02-2024 20:43:33');
   const [endTime] = useState('19-02-2024 20:43:33');
+  const [jobs, setJobs] = useState<IGetJobList | null>(null);
+  const [visible, { open, close }] = useDisclosure(false);
+
+  useEffect(() => {
+    open();
+    onGetJobDetail();
+  }, []);
+
+  const onGetJobDetail = async () => {
+    try {
+      const res = await apiGetJobDetail(id as string);
+      setJobs(res?.data[0]);
+      close();
+    } catch (error: any) {
+      close();
+      const message = error?.response?.data?.message;
+      notifications.show({
+        title: error?.message,
+        message: `${error?.code} : ${message}`,
+        color: 'red',
+      });
+    }
+  };
 
   const cards = mockData.map((article) => (
     <Card key={article.title} p="md" radius="md" component="a" href="#" className={classes.card}>
@@ -67,6 +97,7 @@ export default function DetailFeature() {
 
   return (
     <Box>
+      <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
       <Button
         size="compact-sm"
         onClick={() => router.back()}
@@ -87,13 +118,17 @@ export default function DetailFeature() {
                 ID : <Text span>{id}</Text>
               </Text>
               <Text fw="bold" span>
-                Status : <Text span>Running</Text>
+                Job Name : <Text span>{jobs?.jobName}</Text>
               </Text>
               <Text fw="bold" span>
-                Start Time : <Text span>{startTime}</Text>
+                Status : <Text span>{jobs?.status}</Text>
               </Text>
               <Text fw="bold" span>
-                End Time : <Text span>{endTime}</Text>
+                Start Time :{' '}
+                <Text span>{dayjs(jobs?.jobPeriodStart).format('D MMM YYYY HH:mm')}</Text>
+              </Text>
+              <Text fw="bold" span>
+                End Time : <Text span>{dayjs(jobs?.jobPeriodEnd).format('D MMM YYYY HH:mm')}</Text>
               </Text>
               <Text fw="bold" span>
                 Description : <Text span>-</Text>

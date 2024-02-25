@@ -1,10 +1,10 @@
 'use client';
 
 import { Button, Checkbox, Paper, PasswordInput, TextInput, Title } from '@mantine/core';
-
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 import { useCookies } from 'react-cookie';
+
 import classes from './styles.module.css';
 
 const CAPSTONE_SESSION_TOKEN = process.env.CAPSTONE_SESSION_TOKEN || 'capstone-session-token';
