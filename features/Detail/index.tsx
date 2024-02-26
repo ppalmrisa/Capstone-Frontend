@@ -55,8 +55,6 @@ const mockData = [
 export default function DetailFeature() {
   const router = useRouter();
   const { id } = useParams();
-  const [startTime] = useState('19-02-2024 20:43:33');
-  const [endTime] = useState('19-02-2024 20:43:33');
   const [jobs, setJobs] = useState<IGetJobList | null>(null);
   const [visible, { open, close }] = useDisclosure(false);
 
