@@ -5,12 +5,13 @@ export interface IGetJobList {
   jobPeriodStart: string;
   jobPeriodEnd: string;
   camera: string;
+  description: string;
 }
 
 export interface ICreateJob {
   jobName: string;
-  jobPeriodStart: string;
-  jobPeriodEnd: string;
+  jobPeriodStart: Date | string;
+  jobPeriodEnd: Date | string;
   camera: string;
   description: string;
 }

@@ -1,38 +1,51 @@
 'use client';
 
 import { Box, Button, Grid, Text, TextInput, Textarea } from '@mantine/core';
+import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
+import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 
-interface ICreateForm {
-  name: string;
-  startTime: string;
-  endTime: string;
-  camera: string;
-  description: string;
-}
+import { apiCreateJob } from '@/api/home';
+import { ICreateJob } from '@/types';
 
 export default function CreateFeature() {
   const router = useRouter();
-  const form = useForm<ICreateForm>({
+  const form = useForm<ICreateJob>({
     initialValues: {
-      name: '',
-      startTime: '',
-      endTime: '',
+      jobName: '',
+      jobPeriodStart: dayjs().toDate(),
+      jobPeriodEnd: dayjs().toDate(),
       camera: '',
       description: '',
     },
+    validate: {
+      jobName: (value) => (value.length < 3 ? 'Name must have at least 3 letters' : null),
+      jobPeriodStart: (value) => (value ? null : 'Start Date is required'),
+      jobPeriodEnd: (value) => (value ? null : 'Start Date is required'),
+      description: (value) => (value ? null : 'Description is required'),
+    },
   });
 
-  const onSubmit = (values: ICreateForm) => {
-    notifications.show({
-      title: 'Create Job successfully',
-      message: 'Job created 🤥',
-      color: 'green',
-    });
-    router.push('/home');
+  const onSubmit = async (values: ICreateJob) => {
+    try {
+      await apiCreateJob(values);
+      notifications.show({
+        title: 'Create Job successfully',
+        message: 'Job created 🤥',
+        color: 'green',
+      });
+      router.push('/home');
+    } catch (error: any) {
+      const message = error?.response?.data?.message;
+      notifications.show({
+        title: error?.message,
+        message: `${error?.code} : ${message}`,
+        color: 'red',
+      });
+    }
   };
 
   return (
@@ -52,20 +65,24 @@ export default function CreateFeature() {
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Grid>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput label="Name" placeholder="Name" {...form.getInputProps('name')} />
+            <TextInput label="Name" placeholder="Name" {...form.getInputProps('jobName')} />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
             <TextInput label="Camera" placeholder="Camera" {...form.getInputProps('camera')} />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label="Start Time"
-              placeholder="Start Time"
-              {...form.getInputProps('startTime')}
+            <DateTimePicker
+              label="Pick start date"
+              placeholder="Pick start date"
+              {...form.getInputProps('jobPeriodStart')}
             />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput label="End Time" placeholder="End Time" {...form.getInputProps('endTime')} />
+            <DateTimePicker
+              label="Pick end date"
+              placeholder="Pick end date"
+              {...form.getInputProps('jobPeriodEnd')}
+            />
           </Grid.Col>
           <Grid.Col span={12}>
             <Textarea

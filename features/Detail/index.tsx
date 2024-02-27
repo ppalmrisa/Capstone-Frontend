@@ -135,6 +135,9 @@ export default function DetailFeature() {
                 Job Name : <Text span>{job?.jobName}</Text>
               </Text>
               <Text fw="bold" span>
+                Job Name : <Text span>{job?.camera}</Text>
+              </Text>
+              <Text fw="bold" span>
                 Status :{' '}
                 <Badge variant="light" radius="md" color={statusColor} w={80}>
                   {job?.status}
@@ -148,7 +151,7 @@ export default function DetailFeature() {
                 End Time : <Text span>{dayjs(job?.jobPeriodEnd).format('D MMM YYYY HH:mm')}</Text>
               </Text>
               <Text fw="bold" span>
-                Description : <Text span>-</Text>
+                Description : <Text span>{job?.description || '-'}</Text>
               </Text>
             </Stack>
           </Paper>
