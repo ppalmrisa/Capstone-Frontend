@@ -145,7 +145,7 @@ export default function HomeFeature() {
           <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
             <Table.Tr>
               <Table.Th>No.</Table.Th>
-              <Table.Th>Job</Table.Th>
+              <Table.Th>Job Name</Table.Th>
               <Table.Th>Status</Table.Th>
               <Table.Th>Start date</Table.Th>
               <Table.Th>End date</Table.Th>
