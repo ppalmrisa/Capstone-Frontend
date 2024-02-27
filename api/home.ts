@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-import { ICreateJob, IGetJobList } from '@/types/home';
+import { ICreateJob, IGetJobList, IRequestList } from '@/types/home';
 
 const baseUrl = process.env.BASE_URL;
 
-export const apiGetJobList = async () => {
-  const res = await axios.get<IGetJobList[]>(`${baseUrl}/job`);
+export const apiGetJobList = async (params: { page: number; pageSize: number }) => {
+  const res = await axios.get<IRequestList<IGetJobList>>(`${baseUrl}/job/asPage`, { params });
   return res;
 };
 

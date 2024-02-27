@@ -1,36 +1,21 @@
 'use client';
 
-import {
-  Anchor,
-  Badge,
-  Box,
-  Button,
-  Flex,
-  LoadingOverlay,
-  Menu,
-  ScrollArea,
-  Table,
-  Text,
-  rem,
-} from '@mantine/core';
+import { Box, Button, Flex, LoadingOverlay, ScrollArea, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconDotsVertical, IconFileSearch, IconTrash } from '@tabler/icons-react';
-import cx from 'clsx';
-import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { apiGetJobList } from '@/api/home';
-import { IGetJobList } from '@/types';
+import { IGetJobList, IRequestList } from '@/types';
 
-import classes from './styles.module.css';
+import HomeTable from './Table';
 
 export default function HomeFeature() {
   const router = useRouter();
-  const [jobs, setJobs] = useState<IGetJobList[]>([]);
-  const [scrolled, setScrolled] = useState(false);
+  const [data, setData] = useState<IRequestList<IGetJobList> | null>(null);
   const [visible, { open, close }] = useDisclosure(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     open();
@@ -39,8 +24,8 @@ export default function HomeFeature() {
 
   const onGetJobList = async () => {
     try {
-      const res = await apiGetJobList();
-      setJobs(res?.data);
+      const res = await apiGetJobList({ page: 1, pageSize: 10 });
+      setData(res.data);
       close();
     } catch (error: any) {
       close();
@@ -55,105 +40,17 @@ export default function HomeFeature() {
 
   const handleClickCreate = () => router.push('/create');
 
-  const handleClickDetail = (id: string) => router.push(`/detail/${id}`);
-
-  const rows = jobs.map((row, index) => {
-    let statusColor = 'gray';
-    switch (row.status) {
-      case 'working':
-        statusColor = 'green';
-        break;
-      case 'failed':
-        statusColor = 'red';
-        break;
-      case 'running':
-        statusColor = 'yellow';
-        break;
-      default:
-        break;
-    }
-    return (
-      <Table.Tr key={row.id}>
-        {jobs.length > 0 ? (
-          <>
-            <Table.Td>{index + 1}</Table.Td>
-            <Table.Td>
-              <Anchor component="button" fz="sm">
-                {row.jobName}
-              </Anchor>
-            </Table.Td>
-            <Table.Td>
-              <Badge variant="light" radius="md" color={statusColor} w={80}>
-                {row.status}
-              </Badge>
-            </Table.Td>
-            <Table.Td>
-              <Text w={130} size="sm">
-                {dayjs(row.jobPeriodStart).format('D MMM YYYY HH:mm')}
-              </Text>
-            </Table.Td>
-            <Table.Td>
-              <Text w={130} size="sm">
-                {dayjs(row.jobPeriodEnd).format('D MMM YYYY HH:mm')}
-              </Text>
-            </Table.Td>
-            <Table.Td>
-              <Menu shadow="md" radius="md">
-                <Menu.Target>
-                  <Button variant="transparent" radius="xl">
-                    <IconDotsVertical />
-                  </Button>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item
-                    leftSection={
-                      <IconFileSearch style={{ width: rem(14), height: rem(14) }} color="blue" />
-                    }
-                    onClick={() => handleClickDetail(row.id)}
-                  >
-                    View
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconTrash style={{ width: rem(14), height: rem(14) }} color="red" />
-                    }
-                  >
-                    Delete
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </Table.Td>
-          </>
-        ) : (
-          <Table.Td>No Data</Table.Td>
-        )}
-      </Table.Tr>
-    );
-  });
-
   return (
     <Box>
       <Flex justify="space-between" align="center" mb="md">
         <Text size="32px" fw="bold" mb="md">
-          Job List<Text size="md" span>{` (Total: ${rows.length})`}</Text>
+          Job List<Text size="md" span>{` (Total: ${data?.data?.length})`}</Text>
         </Text>
         <Button onClick={handleClickCreate}>Create Job</Button>
       </Flex>
       <ScrollArea h={500} onScrollPositionChange={({ y }) => setScrolled(y !== 0)} type="always">
         <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
-        <Table verticalSpacing="xs" w={600}>
-          <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-            <Table.Tr>
-              <Table.Th>No.</Table.Th>
-              <Table.Th>Job Name</Table.Th>
-              <Table.Th>Status</Table.Th>
-              <Table.Th>Start date</Table.Th>
-              <Table.Th>End date</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+        {data && <HomeTable data={data} scrolled={scrolled} />}
       </ScrollArea>
     </Box>
   );

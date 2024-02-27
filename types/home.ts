@@ -15,3 +15,8 @@ export interface ICreateJob {
   camera: string;
   description: string;
 }
+
+export interface IRequestList<t> {
+  data: t[];
+  totalCount: number;
+}
