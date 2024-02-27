@@ -2,6 +2,7 @@
 
 import {
   AspectRatio,
+  Badge,
   Box,
   Button,
   Card,
@@ -55,7 +56,7 @@ const mockData = [
 export default function DetailFeature() {
   const router = useRouter();
   const { id } = useParams();
-  const [jobs, setJobs] = useState<IGetJobList | null>(null);
+  const [job, setJobs] = useState<IGetJobList | null>(null);
   const [visible, { open, close }] = useDisclosure(false);
 
   useEffect(() => {
@@ -93,6 +94,21 @@ export default function DetailFeature() {
     </Card>
   ));
 
+  let statusColor = 'gray';
+  switch (job?.status) {
+    case 'working':
+      statusColor = 'green';
+      break;
+    case 'failed':
+      statusColor = 'red';
+      break;
+    case 'running':
+      statusColor = 'yellow';
+      break;
+    default:
+      break;
+  }
+
   return (
     <Box>
       <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
@@ -116,17 +132,20 @@ export default function DetailFeature() {
                 ID : <Text span>{id}</Text>
               </Text>
               <Text fw="bold" span>
-                Job Name : <Text span>{jobs?.jobName}</Text>
+                Job Name : <Text span>{job?.jobName}</Text>
               </Text>
               <Text fw="bold" span>
-                Status : <Text span>{jobs?.status}</Text>
+                Status :{' '}
+                <Badge variant="light" radius="md" color={statusColor} w={80}>
+                  {job?.status}
+                </Badge>
               </Text>
               <Text fw="bold" span>
                 Start Time :{' '}
-                <Text span>{dayjs(jobs?.jobPeriodStart).format('D MMM YYYY HH:mm')}</Text>
+                <Text span>{dayjs(job?.jobPeriodStart).format('D MMM YYYY HH:mm')}</Text>
               </Text>
               <Text fw="bold" span>
-                End Time : <Text span>{dayjs(jobs?.jobPeriodEnd).format('D MMM YYYY HH:mm')}</Text>
+                End Time : <Text span>{dayjs(job?.jobPeriodEnd).format('D MMM YYYY HH:mm')}</Text>
               </Text>
               <Text fw="bold" span>
                 Description : <Text span>-</Text>
