@@ -34,7 +34,7 @@ export default function Pagination({ total }: IPagination) {
       case 'prev':
         return page === 1;
       case 'next':
-        return page === total / pageSize;
+        return page * pageSize >= total;
     }
   };
 

@@ -6,13 +6,27 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-import { apiCreateJob } from '@/api/home';
+import { apiCreateJob, apiGetJobDetail, apiUpdateJob } from '@/api/home';
 import { ICreateJob } from '@/types';
 
-export default function CreateFeature() {
+interface ICreateFeature {
+  type: 'create' | 'edit';
+}
+
+export default function CreateFeature({ type }: ICreateFeature) {
   const router = useRouter();
+  const Title = type === 'create' ? 'Create Job' : 'Edit Job';
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (type === 'edit') {
+      onGetJobDetail();
+    }
+  }, [type]);
+
   const form = useForm<ICreateJob>({
     initialValues: {
       jobName: '',
@@ -29,12 +43,39 @@ export default function CreateFeature() {
     },
   });
 
+  const onGetJobDetail = async () => {
+    try {
+      const res = await apiGetJobDetail(id as string);
+      form.setValues({
+        ...res.data[0],
+        jobPeriodStart: dayjs(res.data[0].jobPeriodStart).toDate(),
+        jobPeriodEnd: dayjs(res.data[0].jobPeriodEnd).toDate(),
+      });
+    } catch (error: any) {
+      const message = error?.response?.data?.message;
+      notifications.show({
+        title: error?.message,
+        message: `${error?.code} : ${message}`,
+        color: 'red',
+      });
+    }
+  };
+
   const onSubmit = async (values: ICreateJob) => {
+    if (type === 'create') {
+      onCreateJob(values);
+    }
+    if (type === 'edit') {
+      onEditJob(values);
+    }
+  };
+
+  const onCreateJob = async (values: ICreateJob) => {
     try {
       await apiCreateJob(values);
       notifications.show({
         title: 'Create Job successfully',
-        message: 'Job created 🤥',
+        message: 'Job created 🥳',
         color: 'green',
       });
       router.push('/home');
@@ -43,6 +84,25 @@ export default function CreateFeature() {
       notifications.show({
         title: error?.message,
         message: `${error?.code} : ${message}`,
+        color: 'red',
+      });
+    }
+  };
+
+  const onEditJob = async (values: ICreateJob) => {
+    try {
+      await apiUpdateJob(values);
+      notifications.show({
+        title: 'Edit Job successfully',
+        message: 'Job Edited 🥳',
+        color: 'green',
+      });
+      router.push('/home');
+    } catch (error: any) {
+      const message = error?.response?.data?.message;
+      notifications.show({
+        title: error?.message,
+        message: `${error?.code} 🥺 : ${message}`,
         color: 'red',
       });
     }
@@ -60,7 +120,7 @@ export default function CreateFeature() {
         Back
       </Button>
       <Text size="32px" fw="bold" mb="md">
-        Create Job
+        {Title}
       </Text>
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Grid>
@@ -92,8 +152,8 @@ export default function CreateFeature() {
             />
           </Grid.Col>
         </Grid>
-        <Button type="submit" mt="md" fullWidth>
-          submit
+        <Button type="submit" mt="md" fullWidth bg={type === 'edit' ? 'green' : 'main'}>
+          edit
         </Button>
       </form>
     </Box>

@@ -18,12 +18,13 @@ export default function HomeFeature() {
   const [data, setData] = useState<IRequestList<IGetJobList> | null>(null);
   const [visible, { open, close }] = useDisclosure(false);
   const [scrolled, setScrolled] = useState(false);
-  const { setQueryParams } = useQueryParams();
+  const { setQueryParams, deleteQueryParam } = useQueryParams();
   // params
   const searchParams = useSearchParams();
   const jobName = searchParams.get('jobName');
   const page = Number(searchParams.get('page'));
   const pageSize = Number(searchParams.get('pageSize'));
+  const deleteSuccessfully = searchParams.get('deleteSuccessfully');
 
   useEffect(() => {
     setQueryParams({
@@ -31,15 +32,18 @@ export default function HomeFeature() {
       ...(!page ? { page: 1 } : {}),
       ...(!pageSize ? { pageSize: 10 } : {}),
     });
-    open();
-    onGetJobList();
-  }, [jobName, page, pageSize]);
+    if (page !== 0) {
+      open();
+      onGetJobList();
+    }
+  }, [jobName, page, pageSize, deleteSuccessfully]);
 
   const onGetJobList = async () => {
     try {
       const res = await apiGetJobList({ page, pageSize, jobName: jobName || '' });
       setData(res.data);
       close();
+      deleteQueryParam('deleteSuccessfully');
     } catch (error: any) {
       close();
       const message = error?.response?.data?.message;
@@ -57,11 +61,15 @@ export default function HomeFeature() {
     <Box>
       <Flex justify="space-between" align="center" mb="md">
         <Text size="32px" fw="bold" mb="md">
-          Job List<Text size="md" span>{` (Total: ${data?.data?.length})`}</Text>
+          Job List{data?.data && <Text size="md" span>{` (Total: ${data?.data?.length})`}</Text>}
         </Text>
         <Button onClick={handleClickCreate}>Create Job</Button>
       </Flex>
-      <ScrollArea h={620} onScrollPositionChange={({ y }) => setScrolled(y !== 0)} type="always">
+      <ScrollArea
+        h={data?.data && data.data.length ? 620 : 'auto'}
+        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+        type="always"
+      >
         <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
         {data && <HomeTable data={data} scrolled={scrolled} />}
       </ScrollArea>

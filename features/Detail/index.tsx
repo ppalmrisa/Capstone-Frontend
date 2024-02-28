@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Card,
+  Flex,
   Grid,
   Image,
   LoadingOverlay,
@@ -121,9 +122,14 @@ export default function DetailFeature() {
       >
         Back
       </Button>
-      <Text size="32px" fw="bold" mb="md">
-        Job Detail
-      </Text>
+      <Flex justify="space-between" align="center">
+        <Text size="32px" fw="bold" mb="md">
+          Job Detail
+        </Text>
+        <Button onClick={() => router.push(`/edit/${id}`)} size="compact-md">
+          Edit Job
+        </Button>
+      </Flex>
       <Grid w={{ base: '100%', md: '900px' }}>
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Paper withBorder p="md" h="100%">

@@ -36,11 +36,7 @@ export const apiDeleteJob = async (id: string) => {
   return res;
 };
 
-export const apiUpdateJob = async (id: string, data: ICreateJob) => {
-  const res = await axios.put(`${baseUrl}/job`, data, {
-    params: {
-      id,
-    },
-  });
+export const apiUpdateJob = async (data: ICreateJob) => {
+  const res = await axios.put(`${baseUrl}/job`, data);
   return res;
 };

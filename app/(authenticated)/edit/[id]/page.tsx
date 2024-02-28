@@ -1,5 +1,5 @@
 import CreateFeature from '@/features/Create';
 
 export default function CreatePage() {
-  return <CreateFeature type="create" />;
+  return <CreateFeature type="edit" />;
 }
