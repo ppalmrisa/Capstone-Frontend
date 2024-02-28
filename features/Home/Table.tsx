@@ -61,13 +61,16 @@ export default function HomeTable({ data, scrolled }: IHomeTable) {
       let statusColor = 'gray';
       switch (row.status) {
         case 'working':
-          statusColor = 'green';
+          statusColor = 'blue';
           break;
         case 'failed':
           statusColor = 'red';
           break;
-        case 'running':
+        case 'waiting':
           statusColor = 'yellow';
+          break;
+        case 'done':
+          statusColor = 'green';
           break;
         default:
           break;
