@@ -72,12 +72,15 @@ export default function DetailFeature() {
   let statusColor = 'gray';
   switch (job?.status) {
     case 'working':
-      statusColor = 'green';
+      statusColor = 'blue';
       break;
     case 'failed':
       statusColor = 'red';
       break;
-    case 'running':
+    case 'done':
+      statusColor = 'green';
+      break;
+    case 'waiting':
       statusColor = 'yellow';
       break;
     default:
