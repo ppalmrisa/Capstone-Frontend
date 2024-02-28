@@ -1,11 +1,12 @@
 export interface IGetJobList {
   id: string;
   jobName: string;
-  status: 'waiting' | 'running' | 'working' | 'failed';
+  status: 'waiting' | 'done' | 'working' | 'failed';
   jobPeriodStart: string;
   jobPeriodEnd: string;
   camera: string;
   description: string;
+  results: string[];
 }
 
 export interface ICreateJob {
@@ -14,6 +15,7 @@ export interface ICreateJob {
   jobPeriodEnd: Date | string;
   camera: string;
   description: string;
+  status: string;
 }
 
 export interface IRequestList<t> {

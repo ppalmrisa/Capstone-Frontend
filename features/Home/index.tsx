@@ -19,7 +19,7 @@ export default function HomeFeature() {
   const [visible, { open, close }] = useDisclosure(false);
   const [scrolled, setScrolled] = useState(false);
   const { setQueryParams, deleteQueryParam } = useQueryParams();
-  // params
+  // query params
   const searchParams = useSearchParams();
   const jobName = searchParams.get('jobName');
   const page = Number(searchParams.get('page'));
@@ -63,17 +63,17 @@ export default function HomeFeature() {
         <Text size="32px" fw="bold" mb="md">
           Job List{data?.data && <Text size="md" span>{` (Total: ${data?.data?.length})`}</Text>}
         </Text>
-        <Button onClick={handleClickCreate}>Create Job</Button>
+        {!visible && <Button onClick={handleClickCreate}>Create Job</Button>}
       </Flex>
       <ScrollArea
-        h={data?.data && data.data.length ? 620 : 'auto'}
+        h={data?.data && data.data.length >= 10 ? 620 : 'auto'}
         onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
         type="always"
       >
         <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
         {data && <HomeTable data={data} scrolled={scrolled} />}
       </ScrollArea>
-      <Pagination total={data?.totalCount || 0} />
+      {!visible && <Pagination total={data?.totalCount || 0} />}
     </Box>
   );
 }

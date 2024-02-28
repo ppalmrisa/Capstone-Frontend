@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Grid, Text, TextInput, Textarea } from '@mantine/core';
+import { Box, Button, Grid, Select, Text, TextInput, Textarea } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -18,7 +18,8 @@ interface ICreateFeature {
 
 export default function CreateFeature({ type }: ICreateFeature) {
   const router = useRouter();
-  const Title = type === 'create' ? 'Create Job' : 'Edit Job';
+  const title = type === 'create' ? 'Create Job' : 'Edit Job';
+  const submitLabel = type === 'edit' ? 'Edit' : 'Submit';
   const { id } = useParams();
 
   useEffect(() => {
@@ -30,16 +31,18 @@ export default function CreateFeature({ type }: ICreateFeature) {
   const form = useForm<ICreateJob>({
     initialValues: {
       jobName: '',
-      jobPeriodStart: dayjs().toDate(),
-      jobPeriodEnd: dayjs().toDate(),
+      jobPeriodStart: '',
+      jobPeriodEnd: '',
       camera: '',
       description: '',
+      status: '',
     },
     validate: {
       jobName: (value) => (value.length < 3 ? 'Name must have at least 3 letters' : null),
       jobPeriodStart: (value) => (value ? null : 'Start Date is required'),
       jobPeriodEnd: (value) => (value ? null : 'Start Date is required'),
       description: (value) => (value ? null : 'Description is required'),
+      status: (value) => (value ? null : 'Status is required'),
     },
   });
 
@@ -120,7 +123,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
         Back
       </Button>
       <Text size="32px" fw="bold" mb="md">
-        {Title}
+        {title}
       </Text>
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Grid>
@@ -144,6 +147,16 @@ export default function CreateFeature({ type }: ICreateFeature) {
               {...form.getInputProps('jobPeriodEnd')}
             />
           </Grid.Col>
+          {type === 'edit' && (
+            <Grid.Col span={{ base: 12 }}>
+              <Select
+                label="Status"
+                placeholder="Pick value"
+                data={['waiting', 'running', 'working', 'failed']}
+                {...form.getInputProps('status')}
+              />
+            </Grid.Col>
+          )}
           <Grid.Col span={12}>
             <Textarea
               label="Description"
@@ -153,7 +166,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
           </Grid.Col>
         </Grid>
         <Button type="submit" mt="md" fullWidth bg={type === 'edit' ? 'green' : 'main'}>
-          edit
+          {submitLabel}
         </Button>
       </form>
     </Box>
