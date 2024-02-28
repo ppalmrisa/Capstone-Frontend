@@ -1,9 +1,10 @@
 'use client';
 
-import { Box, Button, Group } from '@mantine/core';
-import { MantineLogo } from '@mantinex/mantine-logo';
+import { Box, Button, Flex, Group, Text, Title } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { useCookies } from 'react-cookie';
+
+import { CameraIcon } from '@/assets';
 
 import classes from './styles.module.css';
 
@@ -22,7 +23,17 @@ export function HeaderMegaMenu() {
     <Box>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
-          <MantineLogo size={30} />
+          <Flex align="center" style={{ cursor: 'pointer' }} onClick={() => router.push('/home')}>
+            <CameraIcon width={50} height={50} />
+            <Flex direction="column" ml={4}>
+              <Title c="blue" order={6} lh={1}>
+                Capstone
+              </Title>
+              <Text c="blue" size="10px">
+                Project
+              </Text>
+            </Flex>
+          </Flex>
           <Group>
             <Button size="compact-md" onClick={handleLogout}>
               Log Out
