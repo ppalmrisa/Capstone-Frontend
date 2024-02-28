@@ -152,7 +152,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
               <Select
                 label="Status"
                 placeholder="Pick value"
-                data={['waiting', 'running', 'working', 'failed']}
+                data={['waiting', 'done', 'working', 'failed']}
                 {...form.getInputProps('status')}
               />
             </Grid.Col>
