@@ -42,7 +42,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
       jobPeriodStart: (value) => (value ? null : 'Start Date is required'),
       jobPeriodEnd: (value) => (value ? null : 'Start Date is required'),
       description: (value) => (value ? null : 'Description is required'),
-      status: (value) => (value ? null : 'Status is required'),
+      status: (value) => (type === 'create' ? null : value ? null : 'Status is required'),
     },
   });
 
@@ -63,6 +63,8 @@ export default function CreateFeature({ type }: ICreateFeature) {
       });
     }
   };
+
+  console.log('form :: ', form.errors);
 
   const onSubmit = async (values: ICreateJob) => {
     if (type === 'create') {
