@@ -4,7 +4,11 @@ import { ICreateJob, IGetJobList, IRequestList } from '@/types/home';
 
 const baseUrl = process.env.BASE_URL;
 
-export const apiGetJobList = async (params: { page: number; pageSize: number }) => {
+export const apiGetJobList = async (params: {
+  page: number;
+  pageSize: number;
+  jobName: string;
+}) => {
   const res = await axios.get<IRequestList<IGetJobList>>(`${baseUrl}/job/asPage`, { params });
   return res;
 };

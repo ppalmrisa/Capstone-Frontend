@@ -1,5 +1,5 @@
-import { ActionIcon, Button, Flex, Menu, Text } from '@mantine/core';
-import { IconChevronDown, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { ActionIcon, Flex, Select, Text } from '@mantine/core';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useSearchParams } from 'next/navigation';
 
 import { useQueryParams } from '@/utils';
@@ -12,9 +12,11 @@ interface IPagination {
 
 export default function Pagination({ total }: IPagination) {
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get('page')) || 1;
+  const page = Number(searchParams.get('page'));
+  const pageSize = Number(searchParams.get('pageSize'));
+
   const { setQueryParams } = useQueryParams();
-  const onClickChangePage = (type: 'prev' | 'next' | 'first' | 'last') => {
+  const onClickChangePage = (type: 'prev' | 'next') => {
     switch (type) {
       case 'prev':
         setQueryParams({ page: page - 1 });
@@ -22,61 +24,44 @@ export default function Pagination({ total }: IPagination) {
       case 'next':
         setQueryParams({ page: page + 1 });
         break;
-      case 'first':
-        setQueryParams({ page: 1 });
-        break;
       default:
         break;
     }
   };
 
-  const disabledButton = (type: 'prev' | 'next' | 'first' | 'last') => {
+  const disabledButton = (type: 'prev' | 'next') => {
     switch (type) {
       case 'prev':
         return page === 1;
-      // case 'next':
-      //   return page === lastPage;
-      case 'first':
-        return page === 1;
-      // case 'last':
-      //   return page === lastPage;
+      case 'next':
+        return page === total / pageSize;
     }
   };
 
-  const onChangeLimit = (limit: number) => {
-    setQueryParams({ page_limit: limit });
+  const onChangeLimit = (value: string | null) => {
+    setQueryParams({ pageSize: value });
   };
 
   return (
     <Flex justify="end" c="gray-text" gap="md" align="center">
-      <Menu shadow="md">
-        <Menu.Target>
-          <Button variant="transparent">
-            <Flex align="center" c="gray-text.4">
-              <Text mr="xs">{`Rows per page: ${total}`}</Text>
-              <IconChevronDown />
-            </Flex>
-          </Button>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Item onClick={() => onChangeLimit(10)}>10</Menu.Item>
-          <Menu.Item onClick={() => onChangeLimit(20)}>20</Menu.Item>
-          <Menu.Item onClick={() => onChangeLimit(50)}>50</Menu.Item>
-          <Menu.Item onClick={() => onChangeLimit(100)}>100</Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
+      <Select
+        value={`${pageSize}`}
+        size="xs"
+        onChange={onChangeLimit}
+        w="80px"
+        data={['10', '20', '50', '100']}
+      />
       <ActionIcon
-        radius="lg"
-        variant="subtle"
+        variant="outline"
         onClick={() => onClickChangePage('prev')}
         disabled={disabledButton('prev')}
         className={classes['action-icon-button']}
       >
         <IconChevronLeft style={{ width: '70%', height: '70%' }} />
       </ActionIcon>
+      <Text size="sm">{`Page : ${page}`}</Text>
       <ActionIcon
-        variant="subtle"
-        radius="lg"
+        variant="outline"
         onClick={() => onClickChangePage('next')}
         disabled={disabledButton('next')}
         className={classes['action-icon-button']}
