@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <Box>
       <HeaderMegaMenu />
       <Container size="responsive" h="calc(100vh - 60px)">
-        <Center h="100%">{children}</Center>
+        <Center pt="xl">{children}</Center>
       </Container>
     </Box>
   );
