@@ -64,8 +64,6 @@ export default function CreateFeature({ type }: ICreateFeature) {
     }
   };
 
-  console.log('form :: ', form.errors);
-
   const onSubmit = async (values: ICreateJob) => {
     if (type === 'create') {
       onCreateJob(values);
