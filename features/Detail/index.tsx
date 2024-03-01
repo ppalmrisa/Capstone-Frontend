@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowLeft, IconEdit } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -103,8 +103,12 @@ export default function DetailFeature() {
         <Text size="32px" fw="bold" mb="md">
           Job Detail
         </Text>
-        <Button onClick={() => router.push(`/edit/${id}`)} size="compact-md">
-          Edit Job
+        <Button
+          onClick={() => router.push(`/edit/${id}`)}
+          size="compact-md"
+          leftSection={<IconEdit />}
+        >
+          Edit
         </Button>
       </Flex>
       <Grid w={{ base: '100%', md: '900px' }}>
