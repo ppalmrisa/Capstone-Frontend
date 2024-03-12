@@ -40,3 +40,13 @@ export const apiUpdateJob = async (data: ICreateJob) => {
   const res = await axios.put(`${baseUrl}/job`, data);
   return res;
 };
+
+export const apiGetImageZipFile = async (jobID: string) => {
+  const res = await axios.get(`${baseUrl}/job/pics`, {
+    params: {
+      jobID,
+    },
+    responseType: 'blob',
+  });
+  return res;
+};

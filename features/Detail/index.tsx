@@ -19,10 +19,11 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft, IconEdit } from '@tabler/icons-react';
 import dayjs from 'dayjs';
+import JSZip from 'jszip';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { apiGetJobDetail } from '@/api/home';
+import { apiGetImageZipFile, apiGetJobDetail } from '@/api/home';
 import { IGetJobList } from '@/types';
 
 import classes from './styles.module.css';
@@ -35,8 +36,11 @@ export default function DetailFeature() {
 
   useEffect(() => {
     open();
-    onGetJobDetail();
-  }, []);
+    if (id) {
+      onGetJobDetail();
+      onGetImageZipFile();
+    }
+  }, [id]);
 
   const onGetJobDetail = async () => {
     try {
@@ -45,6 +49,27 @@ export default function DetailFeature() {
       close();
     } catch (error: any) {
       close();
+      const message = error?.response?.data?.message;
+      notifications.show({
+        title: error?.message,
+        message: `${error?.code} : ${message}`,
+        color: 'red',
+      });
+    }
+  };
+
+  const onGetImageZipFile = async () => {
+    try {
+      // TODO
+      const res = await apiGetImageZipFile(id as string);
+      console.log('onGetImageZipFile :: ', res.data);
+      const zip = new JSZip();
+      const folder = await zip.loadAsync(res.data);
+      console.log('folder :: ', folder);
+      // unzipper
+      // const unzippedData = await unzipFile(file);
+      // console.log(unzippedData);
+    } catch (error: any) {
       const message = error?.response?.data?.message;
       notifications.show({
         title: error?.message,
@@ -122,7 +147,7 @@ export default function DetailFeature() {
                 Job Name : <Text span>{job?.jobName}</Text>
               </Text>
               <Text fw="bold" span>
-                Job Name : <Text span>{job?.camera}</Text>
+                Camera Name : <Text span>{job?.camera}</Text>
               </Text>
               <Text fw="bold" span>
                 Status :{' '}
