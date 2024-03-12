@@ -1,15 +1,28 @@
 'use client';
 
-import { Anchor, Badge, Box, Button, Group, Menu, Modal, Table, Text, rem } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import {
+  Anchor,
+  Badge,
+  Box,
+  Button,
+  Group,
+  Menu,
+  Modal,
+  ScrollArea,
+  Table,
+  Text,
+  rem,
+} from '@mantine/core';
+import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconDotsVertical, IconEdit, IconFileSearch, IconTrash } from '@tabler/icons-react';
 import cx from 'clsx';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { apiDeleteJob } from '@/api/home';
+import { InputWithButton } from '@/components';
 import { IGetJobList, IRequestList } from '@/types';
 import { useQueryParams } from '@/utils';
 
@@ -17,10 +30,9 @@ import classes from './styles.module.css';
 
 interface IHomeTable {
   data: IRequestList<IGetJobList>;
-  scrolled: boolean;
 }
 
-export default function HomeTable({ data, scrolled }: IHomeTable) {
+export default function HomeTable({ data }: IHomeTable) {
   const { data: jobs } = data;
   const { setQueryParams } = useQueryParams();
   const searchParams = useSearchParams();
@@ -28,6 +40,13 @@ export default function HomeTable({ data, scrolled }: IHomeTable) {
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
   const [jobId, setJobId] = useState('');
+  const [scrolled, setScrolled] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [debounced] = useDebouncedValue(searchValue, 200);
+
+  useEffect(() => {
+    setQueryParams({ jobName: debounced });
+  }, [debounced]);
 
   const handleClickDetail = (type: 'edit' | 'view', id: string) => {
     if (type === 'view') router.push(`/detail/${id}`);
@@ -143,42 +162,49 @@ export default function HomeTable({ data, scrolled }: IHomeTable) {
 
   return (
     <Box>
-      <Table verticalSpacing="xs" w={600}>
-        <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-          <Table.Tr>
-            <Table.Th>No.</Table.Th>
-            <Table.Th>Job Name</Table.Th>
-            <Table.Th>Status</Table.Th>
-            <Table.Th>Start date</Table.Th>
-            <Table.Th>End date</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        {jobs.length > 0 ? (
-          <Table.Tbody>{rows}</Table.Tbody>
-        ) : (
-          <Table.Tbody>
+      <InputWithButton mb="md" onChange={(event) => setSearchValue(event.currentTarget.value)} />
+      <ScrollArea
+        h={data?.data && data.data.length >= 10 ? 620 : 'auto'}
+        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+        type="always"
+      >
+        <Table verticalSpacing="xs" w={600}>
+          <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
             <Table.Tr>
-              <Table.Td />
-              <Table.Td />
-              <Table.Td>
-                <Text size="sm">No Data</Text>
-              </Table.Td>
+              <Table.Th>No.</Table.Th>
+              <Table.Th>Job Name</Table.Th>
+              <Table.Th>Status</Table.Th>
+              <Table.Th>Start date</Table.Th>
+              <Table.Th>End date</Table.Th>
+              <Table.Th />
             </Table.Tr>
-          </Table.Tbody>
-        )}
-      </Table>
-      <Modal opened={opened} onClose={close} title="Delete Job" centered radius="md">
-        <Text>Are you sure you want to delete this job? </Text>
-        <Group gap="sm" justify="flex-end" mt="lg">
-          <Button w="120" variant="outline" onClick={close}>
-            Cancel
-          </Button>
-          <Button bg="red" w="120" onClick={onDeleteJob}>
-            Delete
-          </Button>
-        </Group>
-      </Modal>
+          </Table.Thead>
+          {jobs.length > 0 ? (
+            <Table.Tbody>{rows}</Table.Tbody>
+          ) : (
+            <Table.Tbody>
+              <Table.Tr>
+                <Table.Td />
+                <Table.Td />
+                <Table.Td>
+                  <Text size="sm">No Data</Text>
+                </Table.Td>
+              </Table.Tr>
+            </Table.Tbody>
+          )}
+        </Table>
+        <Modal opened={opened} onClose={close} title="Delete Job" centered radius="md">
+          <Text>Are you sure you want to delete this job? </Text>
+          <Group gap="sm" justify="flex-end" mt="lg">
+            <Button w="120" variant="outline" onClick={close}>
+              Cancel
+            </Button>
+            <Button bg="red" w="120" onClick={onDeleteJob}>
+              Delete
+            </Button>
+          </Group>
+        </Modal>
+      </ScrollArea>
     </Box>
   );
 }

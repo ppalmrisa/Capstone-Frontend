@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Flex, LoadingOverlay, ScrollArea, Text } from '@mantine/core';
+import { Box, Button, Flex, LoadingOverlay, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,8 +17,9 @@ export default function HomeFeature() {
   const router = useRouter();
   const [data, setData] = useState<IRequestList<IGetJobList> | null>(null);
   const [visible, { open, close }] = useDisclosure(false);
-  const [scrolled, setScrolled] = useState(false);
+
   const { setQueryParams, deleteQueryParam } = useQueryParams();
+
   // query params
   const searchParams = useSearchParams();
   const jobName = searchParams.get('jobName');
@@ -65,14 +66,9 @@ export default function HomeFeature() {
         </Text>
         {!visible && <Button onClick={handleClickCreate}>Create Job</Button>}
       </Flex>
-      <ScrollArea
-        h={data?.data && data.data.length >= 10 ? 620 : 'auto'}
-        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-        type="always"
-      >
-        <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
-        {data && <HomeTable data={data} scrolled={scrolled} />}
-      </ScrollArea>
+
+      <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
+      {data && <HomeTable data={data} />}
       {!visible && <Pagination total={data?.totalCount || 0} />}
     </Box>
   );

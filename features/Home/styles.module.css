@@ -9,6 +9,7 @@
   top: 0;
   background-color: var(--mantine-color-body);
   transition: box-shadow 150ms ease;
+  z-index: unset;
 
   &::after {
     content: '';

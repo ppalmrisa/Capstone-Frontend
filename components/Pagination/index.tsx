@@ -41,7 +41,7 @@ export default function Pagination({ total }: IPagination) {
   const onChangeLimit = (value: string | null) => setQueryParams({ pageSize: value });
 
   return (
-    <Flex justify="end" c="gray-text" gap="md" align="center">
+    <Flex justify="end" c="gray-text" gap="md" align="center" mb="xl">
       <Select
         value={`${pageSize}`}
         size="xs"
