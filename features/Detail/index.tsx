@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+
 'use client';
 
 import {
@@ -33,6 +35,7 @@ export default function DetailFeature() {
   const { id } = useParams();
   const [job, setJobs] = useState<IGetJobList | null>(null);
   const [visible, { open, close }] = useDisclosure(false);
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     open();
@@ -62,13 +65,25 @@ export default function DetailFeature() {
     try {
       // TODO
       const res = await apiGetImageZipFile(id as string);
-      console.log('onGetImageZipFile :: ', res.data);
       const zip = new JSZip();
-      const folder = await zip.loadAsync(res.data);
-      console.log('folder :: ', folder);
-      // unzipper
-      // const unzippedData = await unzipFile(file);
-      // console.log(unzippedData);
+      zip.loadAsync(res.data).then((zip: any) => {
+        const imagePromises: any[] = [];
+        zip.forEach((_: any, file: any) => {
+          imagePromises.push(
+            zip
+              .file(file.name)
+              .async('base64')
+              .then((data: any) => {
+                const url = `data:image/jpeg;base64,${data}`;
+                return url;
+              })
+          );
+        });
+
+        Promise.all(imagePromises).then((urls) => {
+          setImages(urls);
+        });
+      });
     } catch (error: any) {
       const message = error?.response?.data?.message;
       notifications.show({
@@ -79,9 +94,9 @@ export default function DetailFeature() {
     }
   };
 
-  const cards = job?.results?.map((image, index) => (
+  const cards = images?.map((img, index) => (
     <Card
-      key={`${index}.${image}`}
+      key={`${index}.${img}`}
       p="md"
       radius="md"
       component="a"
@@ -89,7 +104,7 @@ export default function DetailFeature() {
       className={classes.card}
     >
       <AspectRatio ratio={1920 / 1080}>
-        <Image src={image} />
+        <Image src={img} />
       </AspectRatio>
     </Card>
   ));
