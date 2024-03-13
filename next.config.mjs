@@ -58,19 +58,6 @@ const nextConfig = {
     CAPSTONE_SESSION_TOKEN: process.env.CAPSTONE_SESSION_TOKEN || 'capstone-session-token',
     BASE_URL: process.env.BASE_URL || 'http://localhost:3000',
   },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader.replace(/\n/g, ''),
-          },
-        ],
-      },
-    ];
-  },
 };
 
 export default nextConfig;
