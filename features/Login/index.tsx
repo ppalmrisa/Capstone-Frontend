@@ -42,19 +42,21 @@ export function LoginFeature() {
             Welcome back to Capstone!
           </Title>
           <TextInput
+            id="email"
             label="Email"
             placeholder="hello@gmail.com"
             size="md"
             {...form.getInputProps('email')}
           />
           <PasswordInput
+            id="password"
             label="Password"
             placeholder="Your password"
             mt="md"
             size="md"
             {...form.getInputProps('password')}
           />
-          <Checkbox label="Keep me logged in" mt="xl" size="md" />
+          <Checkbox id="remember" label="Keep me logged in" mt="xl" size="md" />
           <Button fullWidth mt="xl" size="md" type="submit">
             Login
           </Button>
