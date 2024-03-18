@@ -128,13 +128,24 @@ export default function CreateFeature({ type }: ICreateFeature) {
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Grid>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput label="Name" placeholder="Name" {...form.getInputProps('jobName')} />
+            <TextInput
+              id="jobName"
+              label="Name"
+              placeholder="Name"
+              {...form.getInputProps('jobName')}
+            />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput label="Camera" placeholder="Camera" {...form.getInputProps('camera')} />
+            <TextInput
+              id="Camera"
+              label="Camera"
+              placeholder="Camera"
+              {...form.getInputProps('camera')}
+            />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
             <DateTimePicker
+              id="jobPeriodStart"
               label="Pick start date"
               placeholder="Pick start date"
               {...form.getInputProps('jobPeriodStart')}
@@ -142,6 +153,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
             <DateTimePicker
+              id="jobPeriodEnd"
               label="Pick end date"
               placeholder="Pick end date"
               {...form.getInputProps('jobPeriodEnd')}
@@ -150,6 +162,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
           {type === 'edit' && (
             <Grid.Col span={{ base: 12 }}>
               <Select
+                id="status"
                 label="Status"
                 placeholder="Pick value"
                 data={['waiting', 'done', 'working', 'failed']}
@@ -159,6 +172,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
           )}
           <Grid.Col span={12}>
             <Textarea
+              id="description"
               label="Description"
               placeholder="Input placeholder"
               {...form.getInputProps('description')}
