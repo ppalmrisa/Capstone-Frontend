@@ -13,13 +13,13 @@ import {
   Text,
   rem,
 } from '@mantine/core';
-import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
+import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconDotsVertical, IconEdit, IconFileSearch, IconTrash } from '@tabler/icons-react';
 import cx from 'clsx';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { apiDeleteJob } from '@/api/home';
 import { InputWithButton } from '@/components';
@@ -42,11 +42,6 @@ export default function HomeTable({ data }: IHomeTable) {
   const [jobId, setJobId] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [debounced] = useDebouncedValue(searchValue, 200);
-
-  useEffect(() => {
-    setQueryParams({ jobName: debounced });
-  }, [debounced]);
 
   const handleClickDetail = (type: 'edit' | 'view', id: string) => {
     if (type === 'view') router.push(`/detail/${id}`);
@@ -162,7 +157,22 @@ export default function HomeTable({ data }: IHomeTable) {
 
   return (
     <Box>
-      <InputWithButton mb="md" onChange={(event) => setSearchValue(event.currentTarget.value)} />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setQueryParams({ jobName: searchValue });
+        }}
+      >
+        <InputWithButton
+          mb="md"
+          onChange={(event) => {
+            if (event.currentTarget.value === '') {
+              setQueryParams({ jobName: '' });
+            }
+            setSearchValue(event.currentTarget.value);
+          }}
+        />
+      </form>
       <ScrollArea
         h={data?.data && data.data.length >= 10 ? 620 : 'auto'}
         onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
