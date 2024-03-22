@@ -7,17 +7,23 @@ import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { apiCreateJob, apiGetJobDetail, apiUpdateJob } from '@/api/home';
+import { apiCreateJob, apiGetCameraList, apiGetJobDetail, apiUpdateJob } from '@/api/home';
 import { ICreateJob } from '@/types';
 
 interface ICreateFeature {
   type: 'create' | 'edit';
 }
 
+interface ICameraList {
+  cameraName: string;
+  id: string;
+}
+
 export default function CreateFeature({ type }: ICreateFeature) {
   const router = useRouter();
+  const [cameraList, setCameraList] = useState<ICameraList[]>([]);
   const title = type === 'create' ? 'Create Job' : 'Edit Job';
   const submitLabel = type === 'edit' ? 'Edit' : 'Submit';
   const { id } = useParams();
@@ -27,6 +33,24 @@ export default function CreateFeature({ type }: ICreateFeature) {
       onGetJobDetail();
     }
   }, [type]);
+
+  useEffect(() => {
+    onGetCameraList();
+  }, []);
+
+  const onGetCameraList = async () => {
+    try {
+      const { data } = await apiGetCameraList();
+      setCameraList(data?.data);
+    } catch (error: any) {
+      const message = error?.response?.data?.message;
+      notifications.show({
+        title: error?.message,
+        message: `${error?.code} : ${message}`,
+        color: 'red',
+      });
+    }
+  };
 
   const form = useForm<ICreateJob>({
     initialValues: {
@@ -38,10 +62,20 @@ export default function CreateFeature({ type }: ICreateFeature) {
       status: '',
     },
     validate: {
-      jobName: (value) => (value.length < 3 ? 'Name must have at least 3 letters' : null),
+      jobName: (value) =>
+        value.length < 3
+          ? 'Name must have at least 3 letters'
+          : value.length > 30
+            ? 'Name must have less than 30 letters'
+            : null,
       jobPeriodStart: (value) => (value ? null : 'Start Date is required'),
       jobPeriodEnd: (value) => (value ? null : 'Start Date is required'),
-      description: (value) => (value ? null : 'Description is required'),
+      description: (value) =>
+        value.length < 3
+          ? 'Description must have at least 3 letters'
+          : value.length > 200
+            ? 'Description must have less than 200 letters'
+            : null,
       status: (value) => (type === 'create' ? null : value ? null : 'Status is required'),
     },
   });
@@ -75,13 +109,13 @@ export default function CreateFeature({ type }: ICreateFeature) {
 
   const onCreateJob = async (values: ICreateJob) => {
     try {
-      await apiCreateJob(values);
+      const res = await apiCreateJob(values);
       notifications.show({
         title: 'Create Job successfully',
         message: 'Job created 🥳',
         color: 'green',
       });
-      router.push('/home');
+      router.push(`/progress/${res.data.id}`);
     } catch (error: any) {
       const message = error?.response?.data?.message;
       notifications.show({
@@ -136,10 +170,10 @@ export default function CreateFeature({ type }: ICreateFeature) {
             />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              id="Camera"
-              label="Camera"
-              placeholder="Camera"
+            <Select
+              label="Your favorite library"
+              placeholder="Pick value"
+              data={cameraList.map((c) => c.cameraName)}
               {...form.getInputProps('camera')}
             />
           </Grid.Col>
@@ -148,6 +182,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
               id="jobPeriodStart"
               label="Pick start date"
               placeholder="Pick start date"
+              valueFormat="DD MMM YYYY HH:00"
               {...form.getInputProps('jobPeriodStart')}
             />
           </Grid.Col>
@@ -156,6 +191,9 @@ export default function CreateFeature({ type }: ICreateFeature) {
               id="jobPeriodEnd"
               label="Pick end date"
               placeholder="Pick end date"
+              valueFormat="DD MMM YYYY HH:00"
+              minDate={dayjs(form.values.jobPeriodStart).toDate()}
+              disabled={!form.values.jobPeriodStart}
               {...form.getInputProps('jobPeriodEnd')}
             />
           </Grid.Col>

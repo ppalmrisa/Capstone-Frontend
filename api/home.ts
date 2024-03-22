@@ -50,3 +50,17 @@ export const apiGetImageZipFile = async (jobID: string) => {
   });
   return res;
 };
+
+export const apiGetCameraList = async () => {
+  const res = await axios.get(`${baseUrl}/camera`);
+  return res;
+};
+
+export const apiGetJobProgress = async (jobID: string) => {
+  const res = await axios.get(`${baseUrl}/job/progress`, {
+    params: {
+      jobID,
+    },
+  });
+  return res;
+};
