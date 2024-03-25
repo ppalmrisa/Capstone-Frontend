@@ -171,7 +171,7 @@ export default function CreateFeature({ type }: ICreateFeature) {
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Select
-              label="Your favorite library"
+              label="Camera"
               placeholder="Pick value"
               data={cameraList.map((c) => c.cameraName)}
               {...form.getInputProps('camera')}
