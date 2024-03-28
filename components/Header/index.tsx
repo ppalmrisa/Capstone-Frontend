@@ -27,10 +27,10 @@ export function HeaderMegaMenu() {
             <CameraIcon width={50} height={50} />
             <Flex direction="column" ml={4}>
               <Title c="blue" order={6} lh={1}>
-                Capstone
+              Omniscient
               </Title>
               <Text c="blue" size="10px">
-                Project
+                Eyes
               </Text>
             </Flex>
           </Flex>
